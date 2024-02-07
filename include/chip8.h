@@ -9,16 +9,16 @@ const unsigned int VIDEO_HEIGHT = 32;
 
 class chip8 {
 public:
-  byte r[16];
-  byte memory[4096];
-  address index;
-  address pc;
-  address stack[16];
-  byte sp;
-  byte delay_timer;
-  byte sound_timer;
-  byte keypad[16];
-  uint32_t video[VIDEO_WIDTH * VIDEO_HEIGHT];
+  byte r[16]{};
+  byte memory[4096]{};
+  address index{};
+  address pc{};
+  address stack[16]{};
+  byte sp{};
+  byte delay_timer{};
+  byte sound_timer{};
+  byte keypad[16]{};
+  uint32_t video[VIDEO_WIDTH * VIDEO_HEIGHT]{};
   address opcode;
 
   void init();
