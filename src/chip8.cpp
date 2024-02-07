@@ -389,10 +389,18 @@ void chip8::OP_Fx33() {
   memory[index] = value % 10;
 };
 
-void chip8::OP_Fx55() {
+void chip8::OP_Fx65() {
   byte Vx = (opcode & 0x0F00u) >> 8u;
 
   for (byte i = 0; i <= Vx; ++i) {
     r[i] = memory[index + i];
   }
-}
+};
+
+void chip8::OP_Fx55() {
+  byte Vx = (opcode & 0x0F00u) >> 8u;
+
+  for (byte i = 0; i <= Vx; ++i) {
+    memory[index + i] = r[i];
+  }
+};
