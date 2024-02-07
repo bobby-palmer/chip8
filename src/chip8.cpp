@@ -1,11 +1,9 @@
 #include <fstream>
-#include <iterator>
+#include <random>
 
 #include "chip8.h"
 #include "fontset.h"
 
-const unsigned int ROM_START = 0x200;
-const unsigned int FONTSET_START_ADDRESS = 0x50;
 
 void chip8::init() {
   pc = ROM_START;
@@ -37,6 +35,92 @@ void chip8::load_rom(char const* filename)
 		// Free the buffer
 		delete[] buffer;
 	}
+};
+
+void chip8::load_op() {
+  opcode = (memory[pc] << 8u) | memory[pc + 1];
+  pc += 2;
+};
+
+void chip8::cycle() {
+  load_op();
+  
+  switch ((opcode & 0xF000) >> 12u) {
+    case 0x0: run_op0(); break;
+    case 0x1: OP_1nnn(); break;
+    case 0x2: OP_2nnn(); break;
+    case 0x3: OP_3xkk(); break;
+    case 0x4: OP_4xkk(); break;
+    case 0x5: OP_5xy0(); break;
+    case 0x6: OP_6xkk(); break;
+    case 0x7: OP_7xkk(); break;
+    case 0x8: run_op8(); break;
+    case 0x9: OP_9xy0(); break;
+    case 0xA: OP_Annn(); break;
+    case 0xB: OP_Bnnn(); break;
+    case 0xC: OP_Cxkk(); break;
+    case 0xD: OP_Dxyn(); break;
+    case 0xE: run_opE(); break;
+    case 0xF: run_opF(); break;
+  }
+
+  if (delay_timer > 0) --delay_timer;
+  if (sound_timer > 0) -- sound_timer;
+};
+
+void chip8::run_op0() {
+  switch (opcode & 0x000F) {
+    case 0x0: OP_00E0(); break;
+    case 0xE: OP_00EE(); break;
+    default: OP_NULL(); break;
+  }
+};
+
+void chip8::run_op8() {
+  switch (opcode & 0x000F) {
+    case 0x0: OP_8xy0(); break;
+    case 0x1: OP_8xy1(); break;
+    case 0x2: OP_8xy2(); break;
+    case 0x3: OP_8xy3(); break;
+    case 0x4: OP_8xy4(); break;
+    case 0x5: OP_8xy5(); break;
+    case 0x6: OP_8xy6(); break;
+    case 0x7: OP_8xy7(); break;
+    case 0xE: OP_8xyE(); break;
+    default: OP_NULL(); break;
+  }
+};
+
+void chip8::run_opE() {
+  switch (opcode & 0x000F) {
+    case 0x1: OP_ExA1(); break;
+    case 0xE: OP_Ex9E(); break;
+    default: OP_NULL(); break;
+  }
+};
+
+void chip8::run_opF() {
+  switch (opcode & 0x00FF) {
+    case 0x07: OP_Fx07(); break;
+    case 0x0A: OP_Fx0A(); break;
+    case 0x15: OP_Fx15(); break;
+    case 0x18: OP_Fx18(); break;
+    case 0x1E: OP_Fx1E(); break;
+    case 0x29: OP_Fx29(); break;
+    case 0x33: OP_Fx33(); break;
+    case 0x55: OP_Fx55(); break;
+    case 0x65: OP_Fx65(); break;
+    default: OP_NULL(); break;
+  }
+};
+
+byte chip8::random_byte() {
+  return rand() & 0xFF;
+};
+
+// opcodes
+void chip8::OP_NULL() {
+
 };
 
 void chip8::OP_00E0() {
@@ -196,7 +280,7 @@ void chip8::OP_Cxkk() {
   byte Vx = (opcode & 0x0F00u) >> 8u;
   byte b = opcode & 0x00FFu;
 
-  r[Vx] = byte & //RANDOM BYTE
+  r[Vx] = b & random_byte();
 };
 
 void chip8::OP_Dxyn() {

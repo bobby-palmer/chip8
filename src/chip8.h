@@ -2,8 +2,10 @@
 
 #include "types.h"
 
-#include <chrono>
-#include <random>
+const unsigned int ROM_START = 0x200;
+const unsigned int FONTSET_START_ADDRESS = 0x50;
+const unsigned int VIDEO_WIDTH = 64;
+const unsigned int VIDEO_HEIGHT = 32;
 
 class chip8 {
 public:
@@ -16,13 +18,23 @@ public:
   byte delay_timer;
   byte sound_timer;
   byte keypad[16];
-  uint32_t video[64 * 32];
+  uint32_t video[VIDEO_WIDTH * VIDEO_HEIGHT];
   address opcode;
 
   void init();
   void load_rom(char const* filename);
+  void cycle();
+  void load_op();
+
+  byte random_byte();
+
+  void run_op0();
+  void run_op8();
+  void run_opE();
+  void run_opF();
 
   // opcodes
+  void OP_NULL();
   void OP_00E0();
   void OP_00EE();
   void OP_0nnn();
